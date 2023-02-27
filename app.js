@@ -59,7 +59,7 @@ function mainMenu(person, people) {
         return app(people);
     }
     let displayOption = prompt(
-        `Found ${person[0].firstName} ${person[0].lastName}. Do you want to know their 'info', 'family', or 'descendants'?\nType the option you want or type 'restart' or 'quit'.`
+        `Found ${person[0].firstName} ${person[0].lastName}.\n Do you want to know their 'info', 'family', or 'descendants'?\nType the option you want or type 'restart' or 'quit'.`
     );
     // Routes our application based on the user's input
     switch (displayOption) {
@@ -141,7 +141,13 @@ function displayPerson(person) {
     let personInfo = `First Name: ${person.firstName}\n`;
     personInfo += `Last Name: ${person.lastName}\n`;
     //! TODO #1a: finish getting the rest of the information to display //////////////////////////////////////////
-    alert(personInfo);
+    personInfo += `Gender: ${person.gender}\n`;
+    personInfo += `Date of Birth: ${person.dob}\n`;
+    personInfo += `Height: ${person.height}\n`;
+    personInfo += `Weight: ${person.weight}\n`;
+    personInfo += `Eye Color: ${person.eyeColor}\n`;
+    personInfo += `Occupation: ${person.occupation}\n`;
+    return personInfo;
 }
 // End of displayPerson()
 
@@ -184,3 +190,127 @@ function chars(input) {
 
 //////////////////////////////////////////* End Of Starter Code *//////////////////////////////////////////
 // Any additional functions can be written below this line 👇. Happy Coding! 😁
+
+/**
+ * This help function
+ * @param {Array} people        A string
+ * @return {Array}
+ */
+function searchByTraits(people) {
+    let gender = promptFor("What is the person's gender?", validationGender);
+    let dob = promptFor("What is the person's birthday?", validationDOB);
+    let height = promptFor("How tall is the person?", validationNumber);
+    let weight = promptFor("How much does the person weigh?", validationNumber);
+    let eyeColor = promptFor("What is the person's eye color?", validationEyeColor);
+    let occupation = promptFor("What is the person's occupation?", chars);
+    let result = people
+    .filter(each => each.gender == gender
+        && each.dob == dob
+        && each.height == height
+        && each.weight == weight
+        && each.eyeColor == eyeColor
+        && each.occupation == occupation);
+    return result;
+}
+
+/**
+ * This help function
+ * @param {Object} person
+ * @param {Array} people
+ */
+function findPersonFamily(person, people) {
+    let spouse = people.find(each => each.currentSpouse === person.id);
+    let parents = person.parents.map(each => people.find(i => i.id === each));
+    let siblings = people.filter(each => each.parent === person.parent)
+    let familyInfo = spouse ? `Spouse:\n ${spouse.firstName} ${spouse.lastName}\n` : 'Spouse:\n None\n';
+    familyInfo += 'Parents:\n';
+    parents.length != 0 ? parents.forEach(i => {
+        familyInfo += ` ${i.firstName} ${i.lastName}\n`
+    }) : familyInfo += ' None\n';
+    familyInfo += 'Siblings:\n'
+    siblings ? siblings.forEach(sibling => familyInfo += ` ${sibling.firstName} ${sibling.lastName}\n`) : 'None';
+    return familyInfo;
+}
+
+/**
+ * This helper function
+ * @param {Object} person
+ * @param {Array} people
+ */
+function findPersonDescendants(person, people) {
+    let descendants = people.filter(descendant => descendant.parents.includes(person.id))
+    let descendantInfo = '';
+    descendants.forEach(descendant => descendantInfo += `${descendant.firstName} ${descendant.lastName}\n`)
+    return descendantInfo ? descendantInfo : 'None';
+}
+
+/**
+ * This helper function validate user's input for person's gender
+ * @param {String} input        A string.
+ * @returns {Boolean}
+ */
+ function validationGender(input) {
+    if (input.trim() === 'male' || input.trim() === 'female') {
+        return true
+    }
+    alert('Invalid Gender Format')
+    return false;
+}
+// End of validationGender()
+
+/**
+ * This helper function validate user's input for person's birthday
+ * @param {String} birthday        A string.
+ * @returns {Boolean}
+ */
+ function validationDOB(birthday) {
+    if (!/^\d|\d{2}\/\d|\d{2}\/\d{4}$/g.test(birthday)) {
+        alert('Invalid Date Format')
+        return false
+    }
+    let parts = birthday.split('/');
+    let now = new Date();
+    let month = parseInt(parts[0], 10);
+    let day = parseInt(parts[1], 10);
+    let year = parseInt(parts[2], 10);
+    let currentYear = now.getFullYear();
+
+    if (year >= currentYear) {
+        alert('Invalid Date Format')
+        return false;
+    }
+    if (month < 1 || month > 12) {
+        alert('Invalid Date Format')
+        return false;
+    }
+    if (day < 1 || day > 31) {
+        alert('Invalid Date Format')
+        return false;
+    }
+
+    return true;
+}
+// End of validationDOB()
+
+/**
+ * This helper function validate user's input for person's eye color
+ * @param {String} eyeColor        A string.
+ * @returns {Boolean}
+ */
+ function validationEyeColor(eyeColor) {
+    if (eyeColor.trim() === 'brown' || 'black' || 'blue' || 'hazel' || 'green') {
+        return true
+    }
+    alert('Please input correct eye color')
+    return false;
+}
+// End of validationEyeColor()
+
+/**
+ * @param {number} input        A string.
+ * @returns {Boolean}           Default validation -- no logic yet.
+ */
+ function validationNumber(input) {
+    return true;
+}
+// End of validationNumber()
